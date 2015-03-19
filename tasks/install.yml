@@ -7,13 +7,21 @@
 #   - `ansible_distribution`         → Debian, Ubuntu, RedHat, ...
 #   - `ansible_distribution_release` → precise, wheezy, ...
 #   - `ansible_pkg_mgr`              → apt, yum, ...
+- name: Install apt-transport-https
+  when: ansible_os_family == 'Debian'
+  sudo: yes
+  apt: name=apt-transport-https state=present
+  tags:
+    - deps
+    - varnish
+    - http-cache
 
 - name: Add official APT repository
   when: ansible_os_family == 'Debian'
   sudo: yes
   register: _repo
   apt_repository:
-    repo: "deb http://repo.varnish-cache.org/{{ansible_distribution|lower()}}/ {{ansible_distribution_release}} varnish-{{varnish_version}}"
+    repo: "deb https://repo.varnish-cache.org/{{ansible_distribution|lower()}}/ {{ansible_distribution_release}} varnish-{{varnish_version}}"
   tags:
     - repo
     - varnish
@@ -24,7 +32,7 @@
   sudo: yes
   register: _repo_key
   apt_key:
-    url: "http://repo.varnish-cache.org/{{ansible_distribution|lower()}}/GPG-key.txt"
+    url: "https://repo.varnish-cache.org/GPG-key.txt"
   tags:
     - repo
     - varnish
